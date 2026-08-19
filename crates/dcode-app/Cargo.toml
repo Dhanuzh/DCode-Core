@@ -1,0 +1,88 @@
+[package]
+name = "dcode-app"
+version.workspace = true
+edition.workspace = true
+exclude = ["data/**"]
+
+[[bin]]
+name = "dcode-core"
+path = "src/main.rs"
+
+[features]
+default = ["telegram", "lark", "dingtalk", "weixin", "slack", "discord"]
+telegram = ["dcode-channel/telegram"]
+lark = ["dcode-channel/lark"]
+dingtalk = ["dcode-channel/dingtalk"]
+weixin = ["dcode-channel/weixin"]
+slack = ["dcode-channel/slack"]
+discord = ["dcode-channel/discord"]
+
+[dependencies]
+dcode-common.workspace = true
+dcode-assets.workspace = true
+dcode-db.workspace = true
+dcode-api-types.workspace = true
+dcode-realtime.workspace = true
+dcode-auth.workspace = true
+dcode-system.workspace = true
+dcode-file.workspace = true
+dcode-office.workspace = true
+dcode-shell.workspace = true
+dcode-ai-agent.workspace = true
+dcode-session.workspace = true
+dcode-mcp.workspace = true
+dcode-conversation.workspace = true
+dcode-extension.workspace = true
+dcode-channel.workspace = true
+dcode-team.workspace = true
+dcode-team-prompts.workspace = true
+dcode-cron.workspace = true
+dcode-project.workspace = true
+dcode-assistant.workspace = true
+dcode-runtime.workspace = true
+dcode-process.workspace = true
+aion-config.workspace = true
+axum.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-appender.workspace = true
+tracing-subscriber.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+reqwest.workspace = true
+rmcp = { version = "1.5", features = ["server", "transport-io", "schemars"] }
+anyhow.workspace = true
+async-trait.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_System_Threading",
+] }
+
+[target.'cfg(unix)'.dependencies]
+libc.workspace = true
+
+[dev-dependencies]
+dcode-api-types.workspace = true
+dcode-realtime.workspace = true
+# Enable the `AgentInstance::Mock` variant so tests can build fake agents
+# through the trait-object escape hatch without spawning real CLI processes.
+dcode-ai-agent = { workspace = true, features = ["test-support"] }
+base64.workspace = true
+git2.workspace = true
+http-body-util.workspace = true
+rust_xlsxwriter.workspace = true
+sqlx = { workspace = true, features = ["migrate"] }
+tempfile = "3"
+tower = { workspace = true, features = ["util"] }
+tokio-tungstenite.workspace = true
+futures-util.workspace = true
+wiremock = "0.6"

@@ -1,0 +1,9 @@
+[package]
+name = "dcode-team-prompts"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dcode-api-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
