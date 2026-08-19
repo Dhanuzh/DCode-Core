@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.68](https://github.com/Dhanuzh/DCode-Core/compare/v0.1.67...v0.1.68) (2026-08-19)
+
+
+### Bug Fixes
+
+* **assets:** replace leftover AionUi glyph in the per-agent avatar icon ([62fdfb5](https://github.com/Dhanuzh/DCode-Core/commit/62fdfb59e6fd606e8fc9cd68daf24ae05fd5e8fe))
+* **vertex:** work around aionrs' broken ADC path lookup on Windows ([29e9cfa](https://github.com/Dhanuzh/DCode-Core/commit/29e9cfad9ff11af8276ec8bb7c763631e8ee9823))
+
 ## [0.1.67](https://github.com/iOfficeAI/AionCore/compare/v0.1.66...v0.1.67) (2026-08-14)
 
 
