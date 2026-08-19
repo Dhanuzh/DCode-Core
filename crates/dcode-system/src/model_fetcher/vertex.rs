@@ -191,7 +191,11 @@ async fn token_from_adc(client: &reqwest::Client) -> Result<String, SystemError>
     Ok(body.access_token)
 }
 
-fn adc_path() -> Option<std::path::PathBuf> {
+/// Resolve the local Application Default Credentials path, correctly
+/// accounting for the Windows/POSIX difference (see module-level note on
+/// `ensure_windows_adc_mirror` for why this can't just be handed to the
+/// external `aionrs` agent engine directly).
+pub fn adc_path() -> Option<std::path::PathBuf> {
     if let Ok(explicit) = std::env::var("GOOGLE_APPLICATION_CREDENTIALS") {
         if !explicit.trim().is_empty() {
             return Some(std::path::PathBuf::from(explicit));
@@ -205,6 +209,36 @@ fn adc_path() -> Option<std::path::PathBuf> {
 
     Some(base?.join("gcloud").join("application_default_credentials.json"))
 }
+
+/// Work around a bug in the external `aionrs` agent engine (crate
+/// `aion-providers`, `get_adc_token`): it looks for ADC unconditionally at
+/// `dirs::home_dir().join(".config/gcloud/application_default_credentials.json")`,
+/// with no Windows branch — real `gcloud` on Windows writes to `%APPDATA%\gcloud\...`
+/// instead. `VertexConfig::credentials_file` is not a substitute: aionrs routes
+/// it through its service-account key parser (requires `client_email`), so
+/// pointing it at an ADC token file (which has `client_id`/`client_secret`/
+/// `refresh_token` instead) fails with a confusing "missing field
+/// `client_email`" error.
+///
+/// Best-effort, silent on failure: mirrors our correctly-resolved ADC file to
+/// the exact wrong path aionrs will look at, so its lookup accidentally
+/// succeeds. No-op on POSIX, where the two paths already coincide.
+#[cfg(windows)]
+pub fn ensure_windows_adc_mirror() {
+    let Some(real_path) = adc_path() else { return };
+    let Some(home) = dirs::home_dir() else { return };
+    let expected_path = home.join(".config").join("gcloud").join("application_default_credentials.json");
+    if real_path == expected_path || !real_path.exists() {
+        return;
+    }
+    if let Some(parent) = expected_path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::copy(&real_path, &expected_path);
+}
+
+#[cfg(not(windows))]
+pub fn ensure_windows_adc_mirror() {}
 
 /// Mint a Google OAuth access token for a Vertex deployment.
 ///

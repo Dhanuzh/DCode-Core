@@ -571,6 +571,13 @@ pub(crate) fn vertex_openai_base_url(project_id: &str, location: &str) -> String
 
 pub(crate) fn resolve_vertex_config(json: Option<&str>) -> Option<aion_config::config::VertexConfig> {
     let vc: dcode_api_types::VertexConfig = serde_json::from_str(json?).ok()?;
+    if vc.auth_method == dcode_api_types::VertexAuthMethod::Adc {
+        // aionrs' own ADC lookup is hardcoded to the POSIX path with no
+        // Windows branch; `credentials_file` is not a substitute (it routes
+        // through aionrs' service-account parser instead). Best-effort mirror
+        // the real ADC file to the path aionrs will actually look at.
+        dcode_system::model_fetcher::vertex::ensure_windows_adc_mirror();
+    }
     Some(aion_config::config::VertexConfig {
         project_id: Some(vc.project_id),
         region: Some(vc.location),
